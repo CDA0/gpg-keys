@@ -38,11 +38,11 @@ You can also at this point add a small image tothey key, but I won't cover that.
 
 ## Create a revocation certificate
 
-`gpg --gen-revoke name@example.com --armor > \<name@example.com\>.gpg-revocation-certificate`
+`gpg --armor --gen-revoke name@example.com > \<name@example.com\>.gpg-revocation-certificate`
 
 ## Create qr codes
 
-Use the `./key-to-qr.sh` script to take a key, split it up and create a qrcode for each part.
+Use the `./printkey.sh` script to take a key, split it up and create a qrcode for each part.
 Print these out and store them safely.
 
 ## Test scanned keypair
@@ -50,11 +50,24 @@ Print these out and store them safely.
 Run the following command to ensure the crc of the keypair is good.
 `gpg --dearmor newkey >/dev/null`
 
+If the key is already exported we can diff the files:
+
+`diff input <name@example.com>`
+
 ## Remove the primary key
 
-`gpg --export-secret-subkeys --armor name@example.com > \<name@example.com\>.subkeys.gpg-key`
-`gpg --delete-secret-keys name@example.com`
-`gpg --import \<name@example.com\>.subkeys.gpg-key`
+Check the output of `gpg --list-secret-keys`
+
+```
+gpg --export-secret-subkeys --armor name@example.com > \<name@example.com\>.subkeys.gpg-key
+gpg --delete-secret-keys name@example.com
+gpg --import \<name@example.com\>.subkeys.gpg-key
+```
+
+Now look at the output of `gpg --list-secret-keys` it should say `#sec` in the first key.
+This means that the signing key is not in the keypair.
+
+Now `shred -z -u $file` any exported files.
 
 ## Move to another system
 
@@ -79,9 +92,21 @@ verify the CRC with
 After scanning there might be a 0x0A missing at the end of line 1 and an extra 0x0A at the end of
 the last line.
 
+
+## SSH Keys
+
+To export ssh public key
+
+`gpg --export-ssh-key name@email.com`
+
+and the privatekey
+
+`gpg --export-ssh-secret-key name@email.com`
+
 ## Resources
-https://alexcabal.com/creating-the-perfect-gpg-keypairhttps://alexcabal.com/creating-the-perfect-gpg-keypair
-https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
-https://unix.stackexchange.com/questions/280222/generating-qr-code-of-very-big-file
-http://wiki.debian.org/subkeys
-https://security.stackexchange.com/questions/31594/what-is-a-good-general-purpose-gnupg-key-setup
+
+* https://alexcabal.com/creating-the-perfect-gpg-keypair
+* https://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
+* https://unix.stackexchange.com/questions/280222/generating-qr-code-of-very-big-file
+* http://wiki.debian.org/subkeys
+* https://security.stackexchange.com/questions/31594/what-is-a-good-general-purpose-gnupg-key-setup
