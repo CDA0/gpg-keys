@@ -92,6 +92,19 @@ verify the CRC with
 After scanning there might be a 0x0A missing at the end of line 1 and an extra 0x0A at the end of
 the last line.
 
+Importing to an offline RPI running raspian involves using the loopback pinentry command
+
+`gpg --import --pinentry-mode loopback inputkey`
+
+## Expiring keys
+
+When a key is expiring
+
+`gpg --expert --edit-key <key>`
+
+`key 1`
+
+`expire`
 
 ## SSH Keys
 
